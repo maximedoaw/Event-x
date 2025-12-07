@@ -1,0 +1,237 @@
+import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Calendar,
+  Ticket,
+  Search,
+  Home,
+  Info,
+  Mail,
+  Bell,
+  Heart
+} from "lucide-react";
+import { useState } from "react";
+import {
+  useUser,
+  useClerk,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from "@clerk/clerk-react";
+
+export const NavBar = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isLoaded } = useUser();
+  const clerk = useClerk();
+
+  const menuItems = [
+    { icon: Home, label: "Accueil", href: "/" },
+    { icon: Search, label: "Événements", href: "/events" },
+  ];
+
+  const handleOpenSignIn = () => {
+    clerk.openSignIn();
+    setMobileMenuOpen(false);
+  };
+
+  const handleOpenSignUp = () => {
+    clerk.openSignUp();
+    setMobileMenuOpen(false);
+  };
+
+  return (
+    <>
+      <nav className="w-full bg-white/95 backdrop-blur-lg border-b border-emerald-100 shadow-sm sticky top-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo */}
+            <div className="flex items-center gap-8">
+              <Link
+                to="/"
+                className="flex items-center gap-3 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center shadow-sm group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                  <Calendar className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
+                    EventX
+                  </span>
+                  <span className="text-xs text-emerald-500 font-medium">Live your moments</span>
+                </div>
+              </Link>
+
+              {/* Navigation desktop */}
+              <div className="hidden lg:flex items-center gap-1">
+                {menuItems.map((item, index) => (
+                  <Link
+                    key={index}
+                    to={item.href}
+                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                  >
+                    <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                ))}
+
+                <SignedIn>
+                  <Link
+                    to="/my-workspace"
+                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                  >
+                    <Calendar className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Mon Espace</span>
+                  </Link>
+                  <Link
+                    to="/my-tickets"
+                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                  >
+                    <Ticket className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Mes billets</span>
+                  </Link>
+                  <Link
+                    to="/favorites"
+                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                  >
+                    <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Favoris</span>
+                  </Link>
+                </SignedIn>
+              </div>
+            </div>
+
+            {/* CTA & User Section */}
+            <div className="flex items-center gap-4">
+              {/* Notifications (authentifié seulement) */}
+              <SignedIn>
+                <button className="hidden lg:block p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors relative">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+              </SignedIn>
+
+              {/* Boutons d'authentification ou User Menu */}
+              <div className="hidden lg:flex items-center gap-3">
+                {!isLoaded ? (
+                  <div className="h-10 w-24 bg-emerald-100 rounded-lg animate-pulse"></div>
+                ) : (
+                  <>
+                    <SignedOut>
+                      <button
+                        onClick={handleOpenSignIn}
+                        className="px-5 py-2.5 text-emerald-600 hover:text-emerald-700 font-medium hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                      >
+                        Se connecter
+                      </button>
+                      <button
+                        onClick={handleOpenSignUp}
+                        className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-200 shadow-sm hover:shadow-lg flex items-center gap-2"
+                      >
+                        S'inscrire
+                      </button>
+                    </SignedOut>
+
+                    <SignedIn>
+                      <UserButton />
+                    </SignedIn>
+                  </>
+                )}
+              </div>
+
+              {/* Menu mobile toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 rounded-xl text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                aria-label="Menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu mobile */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-emerald-100 bg-white/95 backdrop-blur-md animate-slideDown">
+            <div className="px-4 py-6 space-y-2">
+              {/* Navigation mobile */}
+              {menuItems.map((item, index) => (
+                <Link
+                  key={index}
+                  to={item.href}
+                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              ))}
+
+              <SignedIn>
+                <Link
+                  to="/my-workspace"
+                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-medium">Mon Espace</span>
+                </Link>
+                <Link
+                  to="/my-tickets"
+                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Ticket className="w-5 h-5" />
+                  <span className="font-medium">Mes billets</span>
+                </Link>
+                <Link
+                  to="/favorites"
+                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Heart className="w-5 h-5" />
+                  <span className="font-medium">Favoris</span>
+                </Link>
+              </SignedIn>
+
+              {/* Authentification mobile */}
+              <SignedOut>
+                <div className="pt-4 border-t border-emerald-100 space-y-3">
+                  <button
+                    onClick={handleOpenSignIn}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3.5 text-emerald-600 font-medium hover:bg-emerald-50 rounded-xl transition-colors border border-emerald-200"
+                  >
+                    Se connecter
+                  </button>
+
+                  <button
+                    onClick={handleOpenSignUp}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all shadow-sm"
+                  >
+                    S'inscrire gratuitement
+                  </button>
+                </div>
+              </SignedOut>
+
+              {/* User Menu mobile */}
+              <SignedIn>
+                <div className="pt-4 border-t border-emerald-100">
+                  <UserButton />
+                </div>
+              </SignedIn>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Espace pour le contenu sous la navbar */}
+      <div className="h-16 lg:h-20"></div>
+
+    </>
+  );
+};
