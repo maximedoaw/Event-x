@@ -19,6 +19,7 @@ export default defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     date: v.string(),
+    location: v.optional(v.string()),
     price: v.optional(v.number()),
     category: v.optional(v.string()),
     createdAt: v.number(),

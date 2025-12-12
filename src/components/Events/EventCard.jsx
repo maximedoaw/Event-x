@@ -66,6 +66,12 @@ export default function EventCard({ event, small = false }) {
               <Clock className="w-3 h-3" />
               {timeStr}
             </p>
+            {event.location && (
+              <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                {event.location}
+              </p>
+            )}
           </div>
         </div>
 

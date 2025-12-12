@@ -9,7 +9,8 @@ import {
   Info,
   Mail,
   Bell,
-  Heart
+  Heart,
+  ShieldCheck
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -24,6 +25,8 @@ export const NavBar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isLoaded } = useUser();
   const clerk = useClerk();
+
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL;
 
   const menuItems = [
     { icon: Home, label: "Accueil", href: "/" },
@@ -96,7 +99,18 @@ export const NavBar = () => {
                   >
                     <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     <span className="font-medium">Favoris</span>
+                    <span className="font-medium">Favoris</span>
                   </Link>
+
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-2 px-4 py-2.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all duration-200 group border border-emerald-200"
+                    >
+                      <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      <span className="font-medium">Admin</span>
+                    </Link>
+                  )}
                 </SignedIn>
               </div>
             </div>
@@ -197,6 +211,17 @@ export const NavBar = () => {
                   <Heart className="w-5 h-5" />
                   <span className="font-medium">Favoris</span>
                 </Link>
+
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-3 px-4 py-3.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span className="font-medium">Administration</span>
+                  </Link>
+                )}
               </SignedIn>
 
               {/* Authentification mobile */}

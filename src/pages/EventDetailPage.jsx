@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "convex/react";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "../hooks/useAuth";
 import { api } from "../../convex/_generated/api";
 import {
   Calendar,
@@ -17,11 +17,13 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useState } from "react";
+import { useClerk } from "@clerk/clerk-react";
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, openSignIn } = useAuth();
+  const clerk = useClerk();
 
   const events = useQuery(api.events.getEvents);
   const event = events?.find(e => e._id === id);
@@ -54,24 +56,29 @@ const EventDetailPage = () => {
   }
 
   const handleBooking = async () => {
+    // Si l'utilisateur n'est pas connecté, ouvrir la modal de connexion
     if (!user) {
-      alert("Veuillez vous connecter pour réserver."); // Could be a better UI feedback
+      openSignIn();
       return;
     }
 
-    if (window.confirm("Confirmer l'inscription à cet événement ?")) {
-      setBookingLoading(true);
-      try {
-        await bookEvent({ eventId: id, clerkId: user.id });
-        // Success handled by UI update (isBooked becomes true)
-        // But we can also show a toast or navigate
-        navigate("/my-tickets");
-      } catch (error) {
-        console.error(error);
-        alert(error.message || "Erreur lors de l'inscription");
-      } finally {
-        setBookingLoading(false);
-      }
+    // Si l'utilisateur est déjà inscrit, ne rien faire
+    if (isBooked) {
+      return;
+    }
+
+    // Sinon, procéder à la réservation
+    setBookingLoading(true);
+    try {
+      await bookEvent({ eventId: id, clerkId: user.id });
+      // Rediriger vers la page des tickets après réservation
+      navigate("/my-tickets");
+    } catch (error) {
+      console.error("Erreur de réservation:", error);
+      // Vous pouvez remplacer alert par un composant toast
+      alert(error.message || "Une erreur est survenue lors de la réservation");
+    } finally {
+      setBookingLoading(false);
     }
   };
 
@@ -112,6 +119,12 @@ const EventDetailPage = () => {
                   <Clock className="w-4 h-4" />
                   <span>{timeStr}</span>
                 </div>
+                {event.location && (
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    <span>{event.location}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-1">
                   <Tag className="w-4 h-4" />
                   <span>{event.category || "Autre"}</span>
@@ -166,40 +179,40 @@ const EventDetailPage = () => {
                   </div>
                 </div>
 
-                {user ? (
-                  isBooked ? (
-                    <div className="w-full py-3 bg-emerald-50 text-emerald-700 font-bold rounded-xl flex items-center justify-center gap-2 border border-emerald-100">
+                {/* Bouton de réservation unique qui gère les trois états */}
+                <button
+                  onClick={handleBooking}
+                  disabled={bookingLoading || (user && isBooked)}
+                  className={`w-full py-3 font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed ${
+                    user && isBooked
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                      : "bg-emerald-600 text-white hover:bg-emerald-700"
+                  }`}
+                >
+                  {bookingLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : user && isBooked ? (
+                    <>
                       <CheckCircle2 className="w-5 h-5" />
-                      Inscrit
-                    </div>
+                      Déjà inscrit
+                    </>
+                  ) : user ? (
+                    <>
+                      <Ticket className="w-5 h-5" />
+                      Réserver ma place
+                    </>
                   ) : (
-                    <button
-                      onClick={handleBooking}
-                      disabled={bookingLoading}
-                      className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                      {bookingLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <>
-                          <Ticket className="w-5 h-5" />
-                          Réserver ma place
-                        </>
-                      )}
-                    </button>
-                  )
-                ) : (
-                  <button
-                    onClick={() => alert("Connectez-vous pour vous inscrire")}
-                    className="w-full py-3 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <User className="w-5 h-5" />
-                    Se connecter
-                  </button>
-                )}
+                    <>
+                      <Ticket className="w-5 h-5" />
+                      Réserver ma place
+                    </>
+                  )}
+                </button>
 
                 <p className="text-xs text-center text-gray-400 mt-4">
-                  Accès immédiat à votre billet après inscription.
+                  {user 
+                    ? "Accès immédiat à votre billet après inscription." 
+                    : "Connectez-vous pour réserver votre place."}
                 </p>
               </div>
 

@@ -1,19 +1,32 @@
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import EventCard from "./EventCard";
+import { Loader2 } from "lucide-react";
 
 export const EventsGrid = () => {
-  const events = [
-    { id: 1, title: "Conférence IA", date: "22 Jan", cover: "/img1.jpg" },
-    { id: 2, title: "Hackathon ENSPY", date: "25 Jan", cover: "/img2.jpg" },
-    { id: 3, title: "Expo Universitaire", date: "28 Jan", cover: "/img3.jpg" },
-  ];
+  const events = useQuery(api.events.getEvents);
+
+  if (!events) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        Aucun événement disponible pour le moment.
+      </div>
+    );
+  }
 
   return (
-    <section className="mt-6">
-      <h3 className="text-lg font-semibold mb-4">Tous les événements</h3>
-
+    <section>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map(event => (
-          <EventCard key={event.id} event={event} />
+          <EventCard key={event._id} event={event} />
         ))}
       </div>
     </section>

@@ -3,7 +3,7 @@ import { useMutation } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
 import { api } from "../../../convex/_generated/api";
 import ImageUpload from "./ImageUpload";
-import { Loader2, Calendar, Type, AlignLeft, DollarSign, Tag } from "lucide-react";
+import { Loader2, Calendar, Type, AlignLeft, DollarSign, Tag, MapPin } from "lucide-react";
 
 const CATEGORIES = [
     "Conférence",
@@ -24,6 +24,7 @@ const EventForm = ({ eventToEdit = null, onSuccess }) => {
         title: "",
         description: "",
         date: "",
+        location: "",
         price: "",
         category: "Autre",
         image: null,
@@ -37,6 +38,7 @@ const EventForm = ({ eventToEdit = null, onSuccess }) => {
                 title: eventToEdit.title,
                 description: eventToEdit.description || "",
                 date: eventToEdit.date || "",
+                location: eventToEdit.location || "",
                 price: eventToEdit.price || 0,
                 category: eventToEdit.category || "Autre",
                 image: eventToEdit.imageUrl || eventToEdit.image || null,
@@ -65,6 +67,7 @@ const EventForm = ({ eventToEdit = null, onSuccess }) => {
                 title: formData.title,
                 description: formData.description,
                 date: formData.date,
+                location: formData.location,
                 price: Number(formData.price) || 0,
                 category: formData.category,
                 image: imageToSave || undefined,
@@ -84,6 +87,7 @@ const EventForm = ({ eventToEdit = null, onSuccess }) => {
                     title: "",
                     description: "",
                     date: "",
+                    location: "",
                     price: "",
                     category: "Autre",
                     image: null,
@@ -144,6 +148,21 @@ const EventForm = ({ eventToEdit = null, onSuccess }) => {
                             value={formData.date}
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-emerald-500" />
+                            Lieu
+                        </label>
+                        <input
+                            type="text"
+                            required
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all outline-none"
+                            placeholder="Ex: Palais des Congrès, Paris"
                         />
                     </div>
 

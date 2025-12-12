@@ -15,7 +15,7 @@ import { useAuth } from "./hooks/useAuth";
 
 // Composant de protection de route avec Convex
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -28,7 +28,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children }) => {
 
 // Route admin protégée avec Convex
 const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -56,7 +56,7 @@ const AdminRoute = ({ children }) => {
     user?.email?.endsWith("@admin.eventx") ||
     user?.role === "admin";
 
-  if (!user || !isAdmin) {
+  if (!isAuthenticated || !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
