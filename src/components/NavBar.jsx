@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
@@ -6,11 +6,9 @@ import {
   Ticket,
   Search,
   Home,
-  Info,
-  Mail,
-  Bell,
   Heart,
-  ShieldCheck
+  ShieldCheck,
+  Bell
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -25,8 +23,17 @@ export const NavBar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isLoaded } = useUser();
   const clerk = useClerk();
+  const location = useLocation(); // Hook pour obtenir la route actuelle
 
   const isAdmin = user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL;
+
+  // Fonction pour vérifier si un lien est actif
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const menuItems = [
     { icon: Home, label: "Accueil", href: "/" },
@@ -42,6 +49,10 @@ export const NavBar = () => {
     clerk.openSignUp();
     setMobileMenuOpen(false);
   };
+
+  // Classes pour les états actif/inactif
+  const activeClasses = "text-emerald-600 bg-emerald-50 font-semibold";
+  const inactiveClasses = "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50";
 
   return (
     <>
@@ -71,9 +82,13 @@ export const NavBar = () => {
                   <Link
                     key={index}
                     to={item.href}
-                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                      isActive(item.href) ? activeClasses : inactiveClasses
+                    }`}
                   >
-                    <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <item.icon className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                      isActive(item.href) ? "text-emerald-600" : ""
+                    }`} />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 ))}
@@ -81,33 +96,48 @@ export const NavBar = () => {
                 <SignedIn>
                   <Link
                     to="/my-workspace"
-                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                      isActive("/my-workspace") ? activeClasses : inactiveClasses
+                    }`}
                   >
-                    <Calendar className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Calendar className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                      isActive("/my-workspace") ? "text-emerald-600" : ""
+                    }`} />
                     <span className="font-medium">Mon Espace</span>
                   </Link>
                   <Link
                     to="/my-tickets"
-                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                      isActive("/my-tickets") ? activeClasses : inactiveClasses
+                    }`}
                   >
-                    <Ticket className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Ticket className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                      isActive("/my-tickets") ? "text-emerald-600" : ""
+                    }`} />
                     <span className="font-medium">Mes billets</span>
                   </Link>
                   <Link
                     to="/favorites"
-                    className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200 group"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                      isActive("/favorites") ? activeClasses : inactiveClasses
+                    }`}
                   >
-                    <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium">Favoris</span>
+                    <Heart className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                      isActive("/favorites") ? "text-emerald-600" : ""
+                    }`} />
                     <span className="font-medium">Favoris</span>
                   </Link>
 
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className="flex items-center gap-2 px-4 py-2.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all duration-200 group border border-emerald-200"
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                        isActive("/admin") ? "text-emerald-700 bg-emerald-100 border border-emerald-200" : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+                      }`}
                     >
-                      <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      <ShieldCheck className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                        isActive("/admin") ? "text-emerald-700" : ""
+                      }`} />
                       <span className="font-medium">Admin</span>
                     </Link>
                   )}
@@ -173,53 +203,88 @@ export const NavBar = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-emerald-100 bg-white/95 backdrop-blur-md animate-slideDown">
             <div className="px-4 py-6 space-y-2">
-              {/* Navigation mobile */}
+              {/* Navigation mobile avec surbrillance */}
               {menuItems.map((item, index) => (
                 <Link
                   key={index}
                   to={item.href}
-                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
+                    isActive(item.href) ? activeClasses : inactiveClasses
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className={`w-5 h-5 ${
+                    isActive(item.href) ? "text-emerald-600" : ""
+                  }`} />
                   <span className="font-medium">{item.label}</span>
+                  {isActive(item.href) && (
+                    <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  )}
                 </Link>
               ))}
 
               <SignedIn>
                 <Link
                   to="/my-workspace"
-                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
+                    isActive("/my-workspace") ? activeClasses : inactiveClasses
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Calendar className="w-5 h-5" />
+                  <Calendar className={`w-5 h-5 ${
+                    isActive("/my-workspace") ? "text-emerald-600" : ""
+                  }`} />
                   <span className="font-medium">Mon Espace</span>
+                  {isActive("/my-workspace") && (
+                    <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  )}
                 </Link>
                 <Link
                   to="/my-tickets"
-                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
+                    isActive("/my-tickets") ? activeClasses : inactiveClasses
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Ticket className="w-5 h-5" />
+                  <Ticket className={`w-5 h-5 ${
+                    isActive("/my-tickets") ? "text-emerald-600" : ""
+                  }`} />
                   <span className="font-medium">Mes billets</span>
+                  {isActive("/my-tickets") && (
+                    <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  )}
                 </Link>
                 <Link
                   to="/favorites"
-                  className="flex items-center gap-3 px-4 py-3.5 text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
+                    isActive("/favorites") ? activeClasses : inactiveClasses
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className={`w-5 h-5 ${
+                    isActive("/favorites") ? "text-emerald-600" : ""
+                  }`} />
                   <span className="font-medium">Favoris</span>
+                  {isActive("/favorites") && (
+                    <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  )}
                 </Link>
 
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="flex items-center gap-3 px-4 py-3.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
+                      isActive("/admin") ? "text-emerald-700 bg-emerald-100 border border-emerald-200" : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <ShieldCheck className="w-5 h-5" />
+                    <ShieldCheck className={`w-5 h-5 ${
+                      isActive("/admin") ? "text-emerald-700" : ""
+                    }`} />
                     <span className="font-medium">Administration</span>
+                    {isActive("/admin") && (
+                      <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    )}
                   </Link>
                 )}
               </SignedIn>
@@ -256,7 +321,6 @@ export const NavBar = () => {
 
       {/* Espace pour le contenu sous la navbar */}
       <div className="h-16 lg:h-20"></div>
-
     </>
   );
 };
