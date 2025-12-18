@@ -1,59 +1,105 @@
 import { useNavigate } from "react-router-dom";
+import { Calendar, Users, Star, Clock, PlusCircle, Ticket } from "lucide-react";
 
 export const Hero = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
-    <section className="mt-6 mb-10">
-      {/* Badge d'accueil */}
-      <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-        </svg>
-        Bienvenue sur EventX
-      </div>
+    <section className="mt-8 mb-12">
+      <div className="flex flex-col lg:flex-row items-center gap-10">
+        {/* Contenu texte */}
+        <div className="lg:w-1/2">
+          {/* Badge d'accueil chaleureux */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-full font-medium mb-6 border border-green-100">
+            <Ticket className="w-4 h-4" />
+            <span>Bienvenue dans notre communauté d'événements</span>
+          </div>
 
-      {/* Titre principal avec effet de dégradé */}
-      <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-        <span className="block">Des événements</span>
-        <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
-          inoubliables
-        </span>
-        <span className="block">vous attendent</span>
-      </h1>
+          {/* Titre principal avec effet plus humain */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <span className="block">Rencontrez, partagez,</span>
+            <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+              vivez ensemble
+            </span>
+            <span className="block">des moments uniques</span>
+          </h1>
 
-      {/* Description */}
-      <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl leading-relaxed">
-        Découvrez, réservez et gérez vos événements favoris en toute simplicité.  
-        <span className="block mt-2 text-gray-700 font-medium">
-          Organisateurs : créez et partagez vos événements avec notre plateforme intuitive.
-        </span>
-      </p>
+          {/* Description personnalisée */}
+          <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+            Rejoignez une communauté passionnée qui donne vie à des expériences mémorables. 
+            Que vous soyez participant ou organisateur, trouvez votre prochaine aventure.
+          </p>
 
-      {/* Call-to-action avec icône */}
-      <div className="flex flex-wrap gap-4 items-center">
-        {/* Bouton secondaire */}
-        <button 
-        className="px-6 py-3 border-2 border-green-600 text-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium"
-        onClick={() => navigate("/my-workspace")}
-        >
-          Créer un événement
-        </button>
-      </div>
+          {/* Appel à l'action convivial */}
+          <div className="flex flex-wrap gap-4 items-center mb-10">
+            <button 
+              className="group px-7 py-3.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-xl hover:from-green-700 hover:to-emerald-600 transition-all duration-300 font-medium flex items-center gap-2 shadow-lg hover:shadow-xl"
+              onClick={() => navigate("/my-workspace")}
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Lancer mon événement</span>
+            </button>
+            
+            <button 
+              className="px-6 py-3.5 border-2 border-green-600 text-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium flex items-center gap-2"
+              onClick={() => navigate("/events")}
+            >
+              <Calendar className="w-5 h-5" />
+              <span>Explorer les événements</span>
+            </button>
+          </div>
 
-      {/* Statistiques ou badges */}
-      <div className="mt-10 flex flex-wrap gap-6">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          <span className="text-gray-700 font-medium">+500 événements</span>
+          {/* Statistiques communautaires avec icônes */}
+          <div className="flex flex-wrap gap-8 pt-6 border-t border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <Users className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-gray-700 font-semibold">+10,000 membres</p>
+                <p className="text-sm text-gray-500">Communauté active</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <Star className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-gray-700 font-semibold">4.8/5</p>
+                <p className="text-sm text-gray-500">Satisfaction</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <Clock className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-gray-700 font-semibold">Support 24/7</p>
+                <p className="text-sm text-gray-500">Toujours là pour vous</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-          <span className="text-gray-700 font-medium">98% de satisfaction</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-400"></div>
-          <span className="text-gray-700 font-medium">Support 24/7</span>
+
+        {/* Image à droite */}
+        <div className="lg:w-1/2 relative">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img 
+              src="img.jpg" 
+              alt="Communauté d'événements heureux" 
+              className="w-full h-[400px] md:h-[500px] object-cover"
+            />
+            
+            {/* Overlay subtil */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            
+          </div>
+          
+          {/* Éléments décoratifs subtils */}
+          <div className="absolute -top-4 -right-4 w-24 h-24 bg-green-100 rounded-full opacity-20"></div>
+          <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-emerald-100 rounded-full opacity-20"></div>
         </div>
       </div>
     </section>
